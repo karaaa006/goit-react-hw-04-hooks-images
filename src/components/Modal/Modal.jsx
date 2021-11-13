@@ -1,23 +1,16 @@
 import { Component } from "react";
 import { createPortal } from "react-dom";
+import PropTypes from "prop-types";
 
 const modalRoot = document.getElementById("modal-root");
 
 export default class Modal extends Component {
   componentDidMount() {
-    const overlay = document.querySelector(".Overlay");
-
     window.addEventListener("keydown", this.handleKeydown);
-
-    overlay.addEventListener("click", this.handleOverlayClick);
   }
 
   componentWillUnmount() {
-    const overlay = document.querySelector(".Overlay");
-
     window.removeEventListener("keydown", this.handleKeydown);
-
-    overlay.removeEventListener("click", this.handleOverlayClick);
   }
 
   handleKeydown = (e) => {
@@ -26,17 +19,25 @@ export default class Modal extends Component {
     }
   };
 
-  handleOverlayClick = () => {
-    this.props.onClose();
+  handleOverlayClick = (e) => {
+    const overlay = document.querySelector(".Overlay");
+
+    if (e.target === overlay) {
+      this.props.onClose();
+    }
   };
   render() {
     return createPortal(
-      <div className="Overlay">
+      <div className="Overlay" onClick={this.handleOverlayClick}>
         <div className="Modal">
-          <img src={this.props.imgUrl} alt="" />
+          <img src={this.props.img.largeImageURL} alt={this.props.img.tags} />
         </div>
       </div>,
       modalRoot
     );
   }
 }
+
+Modal.propTypes = {
+  img: PropTypes.object,
+};

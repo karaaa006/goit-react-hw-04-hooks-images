@@ -7,11 +7,7 @@ import { ImageGallery } from "./components/ImageGallery/ImageGallery";
 import Loader from "react-loader-spinner";
 import { Button } from "./components/Button/Button";
 import Modal from "./components/Modal/Modal";
-/**
- * Добавить propTypes
- * Проверить баги
- *
- */
+
 class App extends Component {
   state = {
     query: "",
@@ -20,7 +16,7 @@ class App extends Component {
     maxPage: 0,
     loading: false,
     showModal: false,
-    currentImage: "",
+    currentImage: {},
   };
 
   handleSubmit = async (e) => {
@@ -28,12 +24,12 @@ class App extends Component {
 
     try {
       this.setState({
-        query: e.target.searchInput.value,
+        query: e.target.query.value,
         currentPage: 1,
         loading: true,
       });
 
-      const res = await getImages(e.target.searchInput.value);
+      const res = await getImages(e.target.query.value);
       const totalImages = await res.totalHits;
       const imageArr = await res.hits;
 
@@ -81,10 +77,12 @@ class App extends Component {
   };
 
   handleClickImage = (e) => {
-    const currentImage = e.target.dataset.large;
+    const currentImage = this.state.imageArr.find((img) => {
+      return img.id === Number.parseInt(e.target.id);
+    });
 
     this.setState({
-      currentImage,
+      currentImage: currentImage,
     });
 
     this.toggleModal();
@@ -113,7 +111,7 @@ class App extends Component {
           )}
 
         {this.state.showModal && (
-          <Modal imgUrl={this.state.currentImage} onClose={this.toggleModal} />
+          <Modal img={this.state.currentImage} onClose={this.toggleModal} />
         )}
       </div>
     );
