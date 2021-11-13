@@ -4,10 +4,9 @@ import PropTypes from "prop-types";
 export function ImageGallery({ imageArr, onClickImage }) {
   return (
     <ul className="ImageGallery">
-      {imageArr.map(({ largeImageURL, id, webformatURL, tags }) => (
+      {imageArr.map(({ id, webformatURL, tags }) => (
         <ImageGalleryItem
           key={id}
-          largeImageURL={largeImageURL}
           webformatURL={webformatURL}
           id={id}
           tags={tags}

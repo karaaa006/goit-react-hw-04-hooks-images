@@ -1,12 +1,6 @@
 import PropTypes from "prop-types";
 
-export function ImageGalleryItem({
-  tags,
-  largeImageURL,
-  id,
-  webformatURL,
-  onClick,
-}) {
+export function ImageGalleryItem({ tags, id, webformatURL, onClick }) {
   return (
     <li className="ImageGalleryItem">
       <img
@@ -14,7 +8,6 @@ export function ImageGalleryItem({
         src={webformatURL}
         alt={tags}
         id={id}
-        data-large={largeImageURL}
         onClick={onClick}
       />
     </li>
