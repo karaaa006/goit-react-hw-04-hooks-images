@@ -76,13 +76,9 @@ class App extends Component {
     }));
   };
 
-  handleClickImage = (e) => {
-    const currentImage = this.state.imageArr.find((img) => {
-      return img.id === Number.parseInt(e.target.id);
-    });
-
+  handleClickImage = (currentImage) => {
     this.setState({
-      currentImage: currentImage,
+      currentImage,
     });
 
     this.toggleModal();
