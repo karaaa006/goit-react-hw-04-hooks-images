@@ -1,5 +1,5 @@
 {
-  "name": "goit-hw-create-react-app-template",
+  "name": "goit-react-hw-04-hooks-images",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -14,7 +14,7 @@
     "react-scripts": "4.0.3",
     "web-vitals": "^1.1.2"
   },
-  "homepage": "http://karaaa006.github.io/goit-react-hw-03-image-finder",
+  "homepage": "http://karaaa006.github.io/goit-react-hw-04-hooks-images",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

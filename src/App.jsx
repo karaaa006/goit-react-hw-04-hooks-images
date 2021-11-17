@@ -1,5 +1,5 @@
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
-import { Component } from "react";
+import { useState } from "react";
 import { getImages, getNextPage } from "./api/api";
 import "./App.scss";
 import { Searchbar } from "./components/Searchbar/Searchbar";
@@ -8,110 +8,86 @@ import Loader from "react-loader-spinner";
 import { Button } from "./components/Button/Button";
 import Modal from "./components/Modal/Modal";
 
-class App extends Component {
-  state = {
-    query: "",
-    imageArr: [],
-    currentPage: 1,
-    maxPage: 0,
-    loading: false,
-    showModal: false,
-    currentImage: {},
-  };
+function App() {
+  const [query, setQuery] = useState("");
+  const [imageArr, setImageArr] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [maxPage, setMaxPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isShowModal, setIsShowModal] = useState(false);
+  const [currentImage, setCurrentImage] = useState({});
 
-  handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      this.setState({
-        query: e.target.query.value,
-        currentPage: 1,
-        loading: true,
-      });
+      setQuery(e.target.query.value);
+      setCurrentPage(1);
+      setIsLoading(true);
 
       const res = await getImages(e.target.query.value);
       const totalImages = await res.totalHits;
       const imageArr = await res.hits;
 
-      const maxPage = Math.ceil(totalImages / imageArr.length);
-
-      this.setState({
-        maxPage,
-        imageArr,
-        loading: false,
-      });
+      setMaxPage(getMaxPage(totalImages, imageArr.length));
+      setImageArr(imageArr);
     } catch (e) {
       console.log(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  handleClickMore = async () => {
+  const getMaxPage = (totalItems, itemsPerPage) => {
+    return Math.ceil(totalItems / itemsPerPage);
+  };
+
+  const handleClickMore = async () => {
     try {
-      this.setState((prev) => {
-        return {
-          currentPage: prev.currentPage + 1,
-          loading: true,
-        };
-      });
-      const res = await getNextPage(
-        this.state.query,
-        this.state.currentPage + 1
-      );
+      setCurrentPage((prev) => prev + 1);
+      setIsLoading(true);
+
+      const res = await getNextPage(query, currentPage + 1);
       const images = await res.hits;
 
-      this.setState((prev) => {
-        return {
-          imageArr: [...prev.imageArr, ...images],
-          loading: false,
-        };
-      });
+      setImageArr((prev) => [...prev, ...images]);
     } catch (e) {
       console.log(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({
-      showModal: !showModal,
-    }));
+  const toggleModal = () => {
+    setIsShowModal(!isShowModal);
   };
 
-  handleClickImage = (currentImage) => {
-    this.setState({
-      currentImage,
-    });
+  const handleClickImage = (currentImage) => {
+    setCurrentImage(currentImage);
 
-    this.toggleModal();
+    toggleModal();
   };
 
-  render() {
-    return (
-      <div className="App">
-        <Searchbar onSubmit={this.handleSubmit} />
-        <ImageGallery
-          imageArr={this.state.imageArr}
-          onClickImage={this.handleClickImage}
-        />
-        <Loader
-          type="TailSpin"
-          color="#3f51b5"
-          height={100}
-          width={100}
-          visible={this.state.loading}
-        />
-        {/* Отображаем кнопку только если есть изображения на странице и 
+  return (
+    <div className="App">
+      <Searchbar onSubmit={handleSubmit} />
+      <ImageGallery imageArr={imageArr} onClickImage={handleClickImage} />
+      <Loader
+        type="TailSpin"
+        color="#3f51b5"
+        height={100}
+        width={100}
+        visible={isLoading}
+      />
+      {/* Отображаем кнопку только если есть изображения на странице и 
             отрендеренна НЕпоследняя страница */}
-        {this.state.imageArr.length > 0 &&
-          this.state.currentPage < this.state.maxPage && (
-            <Button onClick={this.handleClickMore}>Load more</Button>
-          )}
+      {imageArr.length > 0 && currentPage < maxPage && (
+        <Button onClick={handleClickMore}>Load more</Button>
+      )}
 
-        {this.state.showModal && (
-          <Modal img={this.state.currentImage} onClose={this.toggleModal} />
-        )}
-      </div>
-    );
-  }
+      {isShowModal && <Modal img={currentImage} onClose={toggleModal} />}
+    </div>
+  );
 }
 
 export default App;
